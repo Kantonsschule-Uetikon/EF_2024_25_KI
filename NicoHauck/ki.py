@@ -36,4 +36,21 @@ def init_parameter():
     
     return w1, b1, w2, b2
 
+def aktivierung(z):
+    if z > 0:
+        return 1
+    else:
+        return 0
+
+def softmax(z):                      #softmax gibt wahrscheinlichkeiten zurück
+    return np.exp(z) / sum(np.exp(z))
+
+def vorwärts(w1, b1, w2, b2, X):
+    z1 = w1.dot(X) + b1
+    a1 = aktivierung(z1)
+    z2 = w2.dot(a1) + b2
+    a2 = softmax(z2)
+    return z1, a1, z2, a2
+
+
 
