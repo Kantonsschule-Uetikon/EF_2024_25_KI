@@ -36,7 +36,7 @@ def init_parameter():
     
     return w1, b1, w2, b2
 
-def ReLU(z):
+def ReLU(z):                #eventuell durch sigmoid ersetzen da einkommen sehr hohe werte hat
     return np.maximum(0,z)
 
 def softmax(x):                 #softmax berechnet wahrscheinlichkiten
