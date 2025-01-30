@@ -43,7 +43,7 @@ def ReLU(z):
     return np.maximum(0, z)
 
 def ReLU_abl(z):
-    return z > 0
+    return (z > 0).astype(float)
 
 def softmax(z):                     #softmax berechnet wahrscheinlichkeiten
     exp_z = np.exp(z - np.max(z))
@@ -61,29 +61,36 @@ def label_zu_vektor(label):
 def vorwärts(w1, b1, w2, b2, w3, b3, X):
     z1 = w1.dot(X) + b1
     a1 = ReLU(z1)
+
     z2 = w2.dot(a1) + b2
     a2 = ReLU(z2)
+
     z3 = w3.dot(a2) + b3
     a3 = softmax(z3)
     return z1, a1, z2, a2, z3, a3
 
 
 def rückwärts(z1, a1, z2, a2, z3, a3, w3, w2, X, Y):
-    y_richtig = label_zu_vektor(Y)
-
-    dz3 = a3 - y_richtig
-    dw3 = 1/2 * dz3.dot(a2.T)
-    db3 = 1/2 * np.sum(dz3, 2)
-
-    dz2 = w3.dot(dz3) * ReLU_abl(z2)
-    dw2 = 1/2 * dz2.dot(a1.T)
-    db2 = 1/2 * np.sum(dz2, 2)
-
-    dz1 = w2.dot(dz2) * ReLU_abl(z1)
-    dw1 = 1/2 * dz1.dot(X.T)
-    db1 = 1/2 * np.sum(dz1, 2)
-    #rückwärts propagation machen :(
+    
+    Y = label_zu_vektor(Y)
+    
+    # output
+    dz3 = a3 - Y  # softmax ableitung anscheinend
+    dw3 = 1/2 * np.outer(dz3, a2)
+    db3 = 1/2 * dz3
+    
+    # hidden 2
+    dz2 = w3.T.dot(dz3) * ReLU_abl(z2)
+    dw2 = 1/2 * np.outer(dz2, a1)
+    db2 = 1/2 * dz2
+    
+    # hidden 1
+    dz1 = w2.T.dot(dz2) * ReLU_abl(z1)
+    dw1 = 1/2 * np.outer(dz1, X)
+    db1 = 1/2 * dz1
+    
     return dw1, db1, dw2, db2, dw3, db3
+
 
     
 w1, b1, w2, b2, w3, b3 = init_parameter()
