@@ -46,6 +46,12 @@ def softmax(x):                 #softmax berechnet wahrscheinlichkiten
     e_x = np.exp(x - np.max(x))
     return e_x / e_x.sum()
 
+def label_zu_vektor(label):
+    if label == "Yes":
+        return np.array([1,0])
+    else:
+        return np.array([0,1])
+
 
 def vorwärts(w1, b1, w2, b2, w3, b3, X):
     z1 = w1.dot(X) + b1
@@ -56,9 +62,26 @@ def vorwärts(w1, b1, w2, b2, w3, b3, X):
     a3 = softmax(z3)
     return z1, a1, z2, a2, z3, a3
 
+def rückwärts(z1, a1, z2, a2, z3, a3, X, Y):
+    y_richtig = label_zu_vektor(Y)
+
+    dz3 = a3 -y_richtig
+    dw3 = 
+    db3 = 
+
+    dz2 =
+    dw2 = 
+    db2 = 
+
+    dz1 =
+    dw1 = 
+    db1 = 
+    #rückwärts propagation machen :(
+    return dw1, db1, dw2, db2, dw3, db3
+
 w1, b1, w2, b2, w3, b3 = init_parameter()
 X = features_train[1]
 z1, a1, z2, a2, z3, a3 = vorwärts(w1, b1, w2, b2, w3, b3, X)
 
-print(z1, a1, z2, a2, z3, a3)
-
+#print(z1, a1, z2, a2, z3, a3)
+print(label_zu_vektor(labels_ev[1]))
