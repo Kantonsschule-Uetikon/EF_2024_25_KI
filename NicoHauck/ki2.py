@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow import keras
+import keras
 import numpy as np
 
 #Pre Processing
@@ -29,3 +29,10 @@ features_train = daten[:, :-1].astype(float)[200:1200]
 labels_ev = daten[:, -1][0:200]
 labels_train = daten[:, -1][200:1200]
 
+model = keras.Sequential()
+model.add(keras.input(shape=(6,)))
+model.add(keras.Dense(10, activation="relu"))
+model.add(keras.Dense(10, activation="relu"))
+model.add(keras.Dense(1, activation="sigmoid"))
+
+model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
