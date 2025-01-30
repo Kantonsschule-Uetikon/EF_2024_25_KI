@@ -39,8 +39,10 @@ def init_parameter():
 def ReLU(z):
     return np.maximum(0,z)
 
-def softmax(z):                      #softmax gibt wahrscheinlichkeiten zurück
-    return np.exp(z) / sum(np.exp(z))
+def softmax(x):                 #softmax berechnet wahrscheinlichkiten
+    e_x = np.exp(x - np.max(x))
+    return e_x / e_x.sum()
+
 
 def vorwärts(w1, b1, w2, b2, X):
     z1 = w1.dot(X) + b1
