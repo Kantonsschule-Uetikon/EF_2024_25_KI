@@ -63,6 +63,13 @@ def label_zu_vektor(label):
     else:
         return np.array([0,1])
 
+import numpy as np
+
+def a_to_output(a):
+    output = np.zeros_like(a)
+    output[np.argmax(a)] = 1
+    return output.astype(int)
+
 
 def vorwärts(w1, b1, w2, b2, w3, b3, X):
     z1 = w1.dot(X) + b1
@@ -109,17 +116,25 @@ def update_parameter(w1, b1, w2, b2, w3, b3, dw1, db1, dw2, db2, dw3, db3, learn
 
 def trainieren(X, Y, iterationen, learning_rate):
     w1, b1, w2, b2, w3, b3 = init_parameter()
-    for i in range(iterationen):
-        z1, a1, z2, a2, z3, a3 = vorwärts(w1, b1, w2, b2, w3, b3, X[i])
-        dw1, db1, dw2, db2, dw3, db3 = rückwärts(z1, a1, z2, a2, z3, a3, w3, w2, X[i], Y[i])
-        w1, b1, w2, b2, w3, b3 = update_parameter(w1, b1, w2, b2, w3, b3, dw1, db1, dw2, db2, dw3, db3, learning_rate)
+    for j in range(iterationen):    
+        for i in range(1000):
+            z1, a1, z2, a2, z3, a3 = vorwärts(w1, b1, w2, b2, w3, b3, X[i])
+            dw1, db1, dw2, db2, dw3, db3 = rückwärts(z1, a1, z2, a2, z3, a3, w3, w2, X[i], Y[i])
+            w1, b1, w2, b2, w3, b3 = update_parameter(w1, b1, w2, b2, w3, b3, dw1, db1, dw2, db2, dw3, db3, learning_rate)
     return w1, b1, w2, b2, w3, b3
     
 w1, b1, w2, b2, w3, b3 = trainieren(features_train, labels_train, 100, 0.1)
 
-print(w1)
 
 
+treffer = 0
+for i in range(0, 200):
+    z1, a1, z2, a2, z3, a3 = vorwärts(w1, b1, w2, b2, w3, b3, features_ev[i])
+
+    if np.array_equal(a_to_output(a3), label_zu_vektor(labels_ev[i])):
+        treffer += 1
+
+print(treffer/200)
 
 
 
