@@ -31,10 +31,13 @@ def init_parameter():
     w1 = np.random.rand(10, 7) - 0.5
     b1 = np.random.rand(10,) - 0.5
 
-    w2 = np.random.rand(2, 10) - 0.5
-    b2 = np.random.rand(2,) - 0.5
+    w2 = np.random.rand(10, 10) - 0.5
+    b2 = np.random.rand(10,) - 0.5
+
+    w3 = np.random.rand(2, 10) - 0.5
+    b3 = np.random.rand(2,) - 0.5
     
-    return w1, b1, w2, b2
+    return w1, b1, w2, b2, w3, b3
 
 def ReLU(z):                #eventuell durch sigmoid ersetzen da einkommen sehr hohe werte hat
     return np.maximum(0,z)
@@ -44,16 +47,18 @@ def softmax(x):                 #softmax berechnet wahrscheinlichkiten
     return e_x / e_x.sum()
 
 
-def vorwärts(w1, b1, w2, b2, X):
+def vorwärts(w1, b1, w2, b2, w3, b3, X):
     z1 = w1.dot(X) + b1
     a1 = ReLU(z1)
     z2 = w2.dot(a1) + b2
-    a2 = softmax(z2)
-    return z1, a1, z2, a2
+    a2 = ReLU(z2)
+    z3 = w3.dot(a2) + b3
+    a3 = softmax(z3)
+    return z1, a1, z2, a2, z3, a3
 
-w1, b1, w2, b2 = init_parameter()
+w1, b1, w2, b2, w3, b3 = init_parameter()
 X = features_train[1]
-z1, a1, z2, a2 = vorwärts(w1, b1, w2, b2, X)
+z1, a1, z2, a2, z3, a3 = vorwärts(w1, b1, w2, b2, w3, b3, X)
 
-print(z1, a1, z2, a2)
+print(z1, a1, z2, a2, z3, a3)
 
