@@ -39,12 +39,17 @@ def init_parameter():
     
     return w1, b1, w2, b2, w3, b3
 
-def ReLU(z):                #eventuell durch sigmoid ersetzen da einkommen sehr hohe werte hat
-    return np.maximum(0,z)
+def ReLU(z):
+    return np.maximum(0, z)
 
-def softmax(x):                 #softmax berechnet wahrscheinlichkiten
-    e_x = np.exp(x - np.max(x))
-    return e_x / e_x.sum()
+def ReLU_abl(z):
+    return z > 0
+
+def softmax(z):                     #softmax berechnet wahrscheinlichkeiten
+    exp_z = np.exp(z - np.max(z))
+    return exp_z / np.sum(exp_z)
+
+
 
 def label_zu_vektor(label):
     if label == "Yes":
@@ -62,26 +67,29 @@ def vorwärts(w1, b1, w2, b2, w3, b3, X):
     a3 = softmax(z3)
     return z1, a1, z2, a2, z3, a3
 
-def rückwärts(z1, a1, z2, a2, z3, a3, X, Y):
+
+def rückwärts(z1, a1, z2, a2, z3, a3, w3, w2, X, Y):
     y_richtig = label_zu_vektor(Y)
 
-    dz3 = a3 -y_richtig
-    dw3 = 
-    db3 = 
+    dz3 = a3 - y_richtig
+    dw3 = 1/2 * dz3.dot(a2.T)
+    db3 = 1/2 * np.sum(dz3, 2)
 
-    dz2 =
-    dw2 = 
-    db2 = 
+    dz2 = w3.dot(dz3) * ReLU_abl(z2)
+    dw2 = 1/2 * dz2.dot(a1.T)
+    db2 = 1/2 * np.sum(dz2, 2)
 
-    dz1 =
-    dw1 = 
-    db1 = 
+    dz1 = w2.dot(dz2) * ReLU_abl(z1)
+    dw1 = 1/2 * dz1.dot(X.T)
+    db1 = 1/2 * np.sum(dz1, 2)
     #rückwärts propagation machen :(
     return dw1, db1, dw2, db2, dw3, db3
 
+    
 w1, b1, w2, b2, w3, b3 = init_parameter()
 X = features_train[1]
 z1, a1, z2, a2, z3, a3 = vorwärts(w1, b1, w2, b2, w3, b3, X)
+dw1, db1, dw2, db2, dw3, db3 = rückwärts(z1, a1, z2, a2, z3, a3, w3, w2, X, labels_train[1])
 
-#print(z1, a1, z2, a2, z3, a3)
-print(label_zu_vektor(labels_ev[1]))
+print(dw1, db1, dw2, db2, dw3, db3)
+
