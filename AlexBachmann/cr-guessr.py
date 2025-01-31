@@ -1,34 +1,26 @@
 import csv
-import tensorflow as tf
-from tensorflow.keras import layers
-import pandas as pd
-import numpy as np
 
-cr_trainer = pd.read_csv("dnd_monsters.csv", names=["name", "url", "cr", "type", "size","ac", "hp", "speed", "align", "legendary", "source", "str", "dex", "con", "int", "cha"])
-cr_trainer.head()
+def daten_einlesen(dateiname):
+    features = []
+    labels = []
+    with open(dateiname) as datei:
+        for zeile in csv.reader(datei):  # Jede Zeile
+            features.append([zeile[0],zeile[5],zeile[6]])
+            labels.append(zeile[2])
+    return features, labels
 
-cr_features = cr_trainer.copy()
-cr_labels = cr_features.pop("cr")
-cr_features = np.array(cr_features)
-cr_features
+features, labels = daten_einlesen("AlexBachmann/dnd_monsters.csv")
 
-cr_model = tf.keras.Sequential([
-  layers.Dense(64, activation='relu'),
-  layers.Dense(1)
-])
-
-cr_model.compile(loss = tf.keras.losses.MeanSquaredError(), optimizer = tf.keras.optimizers.Adam())
-
-cr_model.fit(cr_features, cr_labels, epochs=10)
-
-normalize = layers.Normalization()
-
-norm_cr_model = tf.keras.Sequential([
-  normalize,
-  layers.Dense(64, activation='relu'),
-  layers.Dense(1)
-])
-
-norm_abalone_model.compile(loss = tf.keras.losses.MeanSquaredError(), optimizer = tf.keras.optimizers.Adam())
-
-norm_abalone_model.fit(cr_features, cr_labels, epochs=10)
+for messwerte, label in zip (features, labels):
+    #print(f"Eine {label} mit den Messwerten {messwerte}.")
+    
+    x0 = 0
+    x1 = float(messwerte[1]) #ac
+    x2 = float(messwerte[2]) #hp
+    w0 = 1
+    w1 = 1
+    w2 = 1
+    
+    z = x0*w0 + x1*w1 + x2*w2
+    
+    print(z)
