@@ -1,15 +1,19 @@
 import numpy as np
+import pandas as pd
 import sklearn
 from keras.models import Sequential
 from keras.layers import Input, Dense, Dropout
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 
-# Load the Iris dataset
-iris = datasets.load_iris()
-X = iris.data                        # Matrix mit Features × Datensätze
-y = iris.target.reshape(-1, 1)       # Labels
+data = pd.read_csv('datensatz.csv') # Datensatz mit Pandas einlesen
+teams = list(set(data['home_team'])) # eindeutige Liste aller Teams, home_team und away_team enthalten die gleichen Teams, also muss nur eine der beiden verwendet werden
+label_encoder = LabelEncoder()
+data['result'] = label_encoder.fit_transform(data['result'])  # kategorische Werte werden in numerische Werte umgewandelt
+X =                         # Matrix mit Features × Datensätze
+y =        # Labels
+
 
 # One-hot encode the target variable
 encoder = OneHotEncoder(sparse_output=False)
