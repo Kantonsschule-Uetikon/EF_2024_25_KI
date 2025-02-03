@@ -6,10 +6,10 @@ def daten_einlesen(dateiname):
     labels = []
     with open(dateiname, newline='', encoding='utf-8') as datei:
         reader = csv.reader(datei)
-        next(reader, None)  # Skip header row if necessary
-        for zeile in reader:  # Iterate over the reader
+        next(reader, None)
+        for zeile in reader:
             features.append([zeile[0], float(zeile[5]), float(zeile[6])])
-            labels.append(zeile[2])  # Ensure labels are floats
+            labels.append(zeile[2])
     return features, labels
 
 features, labels = daten_einlesen("AlexBachmann/dnd_monsters.csv")
