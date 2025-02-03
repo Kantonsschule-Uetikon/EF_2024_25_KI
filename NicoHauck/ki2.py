@@ -1,6 +1,11 @@
-import tensorflow as tf
-import keras
 import numpy as np
+from keras.models import Sequential
+from keras.layers import Input, Dense, Dropout
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
+
+
 
 #Pre Processing
 marriage_type_map = {"Love": -1, "Arranged": 1}
@@ -29,10 +34,14 @@ features_train = daten[:, :-1].astype(float)[200:1200]
 labels_ev = daten[:, -1][0:200]
 labels_train = daten[:, -1][200:1200]
 
-model = keras.Sequential()
-model.add(keras.input(shape=(6,)))
-model.add(keras.Dense(10, activation="relu"))
-model.add(keras.Dense(10, activation="relu"))
-model.add(keras.Dense(1, activation="sigmoid"))
+encoder = OneHotEncoder(sparse_output=False)
+labels_train_one_hot = encoder.fit_transform(labels_train.reshape(-1, 1))
+labels_ev_one_hot = encoder.transform(labels_ev.reshape(-1, 1))
+
+model = Sequential()
+model.add(Input(shape=(6,)))
+model.add(Dense(10, activation="relu"))
+model.add(Dense(10, activation="relu"))
+model.add(Dense(2, activation="softmax"))
 
 model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
