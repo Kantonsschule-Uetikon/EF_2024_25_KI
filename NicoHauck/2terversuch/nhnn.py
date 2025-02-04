@@ -19,37 +19,32 @@ class nhnn():
             self.input = X
             return self.weights.dot(X) + self.biases
 
-        def rueckwaerts(self, dEdY):
+        def rueckwaerts(self, dEdY, lern_rate):
             dEdw = dEdY.dot(self.input.T)
             dEdb = dEdY
             dEdX = (self.weights.T).dot(dEdY)
 
-            self.weights -= dEdw
-            self.biases -= dEdb
+            self.weights = self.weights - lern_rate * dEdw
+            self.biases = self.biases - lern_rate * dEdb
             return dEdX
             
 
-    class Activation(Layer):
-        def __init__(self):
-            pass
-
-    class Sigmoid(Activation):
+    class Sigmoid(Layer):
         def __init__(self):
             pass
         
-        def sigmoid(X):
+        def sigmoid(self, X):
             return 1 / (1 + np.exp(-X))
         
         def vorwaerts(self, X):
             self.input = X
             return self.sigmoid(X)
 
-        def rueckwaerts(self, dEdY):
-            dEdX = dEdY.multiply(self.sigmoid(self.input)*(1 - self.sigmoid(self.input)))
+        def rueckwaerts(self, dEdY, lern_rate):
+            dEdX = np.multiply(dEdY, self.sigmoid(self.input)*(1 - self.sigmoid(self.input)))
             return dEdX
         
-
-    class Softmax(Activation):
+    class Softmax(Layer):
         def __init__(self):
             pass
         
@@ -62,21 +57,31 @@ class nhnn():
             #ableitung zu schwierig
             pass
 
-    def train(self):
+    def train(self, epochen, lern_rate, X, Y):
+        for i in range (epochen):
+            for x, y in zip(X, Y):
+                    output = x
+                    for layer in self.layers:
+                        output = layer.vorwaerts(output)
+                        print(1)
+
+                    error = y - output
+
+                    for layer in reversed(self.layers):
+                        error = layer.rueckwaerts(error, lern_rate)
         pass
 
     def evaluate(self):
         pass
 
+X = np.reshape([[0,0], [0,1], [1,0], [1,1]], (4, 2, 1)) #liste mit spalten
+Y = np.reshape([[0], [1], [1], [0]], (4, 1, 1))
 
+nn = nhnn([
+    nhnn.Dense(2, 3),
+    nhnn.Sigmoid(),
+    nhnn.Dense(3, 1),
+    nhnn.Sigmoid()
+])
 
-layer1 = nhnn.Dense(5, 2)
-print(layer1.weights)
-print(layer1.biases)
-print(layer1.vorwaerts(np.array([0,1,2,3,4])))
-
-layer2 = nhnn.Sigmoid()
-print(layer2.vorwaerts(np.array([1,0,9,-10])))
-
-layer2 = nhnn.Softmax()
-print(layer2.vorwaerts(np.array([1,2,3])))
+nn.train(100, 0.1, X, Y)
