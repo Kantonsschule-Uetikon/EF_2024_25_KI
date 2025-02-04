@@ -20,7 +20,7 @@ daten  = np.array([
         float(row[1]),  # Marriage Duration
         float(row[2]),  # Age at Marriage
         marriage_type_map[row[3]],  # Marriage Type
-        #float(row[5]),  # Income
+        float(row[5]),  # Income
         urban_rural_map[row[7]],  # Urban/Rural
         family_involvement_map[row[8]],  # Family Involvement
         float(row[9]),  # Children
@@ -39,9 +39,16 @@ labels_train_one_hot = encoder.fit_transform(labels_train.reshape(-1, 1))
 labels_ev_one_hot = encoder.transform(labels_ev.reshape(-1, 1))
 
 model = Sequential()
-model.add(Input(shape=(6,)))
-model.add(Dense(10, activation="relu"))
-model.add(Dense(10, activation="relu"))
+model.add(Input(shape=(7,)))
+model.add(Dense(10, activation="sigmoid"))
+model.add(Dense(10, activation="sigmoid"))
+model.add(Dense(10, activation="sigmoid"))
+model.add(Dropout(0.2))
 model.add(Dense(2, activation="softmax"))
 
 model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
+
+model.fit(features_train, labels_train_one_hot, epochs=100, batch_size=8, validation_split=0.2)
+
+loss, accuracy = model.evaluate(features_ev, labels_ev_one_hot)
+print(f'Loss: {loss}, Accuracy: {accuracy}')
