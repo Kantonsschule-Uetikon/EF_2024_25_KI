@@ -16,13 +16,21 @@ class nhnn():
             self.biases = np.random.rand(output_neurons) - 0.5
 
         def vorwaerts(self, X):
+            self.input = X
             return self.weights.dot(X) + self.biases
 
-        def rueckwaerts(self):
-            pass
+        def rueckwaerts(self, dEdY):
+            dEdw = dEdY.dot(self.input.T)
+            dEdb = dEdY
+            dEdX = (self.weights.T).dot(dEdY)
+
+            self.weights -= dEdw
+            self.biases -= dEdb
+            return dEdX
+            
 
     class Activation(Layer):
-        def __init__(self, neurons):
+        def __init__(self):
             pass
 
     class Sigmoid(Activation):
