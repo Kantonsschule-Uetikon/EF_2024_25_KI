@@ -36,21 +36,30 @@ class nhnn():
     class Sigmoid(Activation):
         def __init__(self):
             pass
-
-        def vorwaerts(self, X):
-            return 1 / (1 + np.exp(-X))
-
-        def rueckwaerts(self):
-            pass
         
+        def sigmoid(X):
+            return 1 / (1 + np.exp(-X))
+        
+        def vorwaerts(self, X):
+            self.input = X
+            return self.sigmoid(X)
+
+        def rueckwaerts(self, dEdY):
+            dEdX = dEdY.multiply(self.sigmoid(self.input)*(1 - self.sigmoid(self.input)))
+            return dEdX
+        
+
     class Softmax(Activation):
         def __init__(self):
             pass
+        
 
         def vorwaerts(self, X):
+            self.input = X
             return np.exp(X) / np.sum(np.exp(X))
     
-        def rueckwaerts(self):
+        def rueckwaerts(self, dEdY):
+            #ableitung zu schwierig
             pass
 
     def train(self):
