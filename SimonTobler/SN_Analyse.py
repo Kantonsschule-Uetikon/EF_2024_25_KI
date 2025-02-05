@@ -4,17 +4,19 @@ from keras.layers import Input, Dense, Dropout
 import pandas
 import csv
 
-# Open the file in read mode
-#Daten = pandas.read_excel('Social_Network_Ads.xls', engine='xlrd')
-#Alter = pandas.read_excel('Social_Network_Ads.xls', usecols=['A'], engine='xlrd')
-#Einkommen = pandas.read_excel('Social_Network_Ads.xls', usecols=['B'], engine='xlrd')
-#Hat_Gekauft = pandas.read_excel('Social_Network_Ads.xls', usecols=['C'], engine='xlrd')
-
 def einlesen(dateiname):
     with open(dateiname) as datei:
-        return [(Age,EstimatedSalary,Purchased) for (Age,EstimatedSalary,Purchased) in csv.reader(datei)]
+        reader = csv.reader(datei)
+        Daten = []
+        for row in reader:
+            Alter = row[0]
+            Einkommen = row[1]
+            HatGekauft = row[2]
+            Daten.append((Alter, Einkommen, HatGekauft))
+        return Daten
 
-einlesen("Social_Network_Ads.csv")
+Daten = einlesen("Social_Network_Ads.csv")
 
-print(Age)
-
+X = Daten[0]
+Y = Daten[1]
+Z = Daten[2]

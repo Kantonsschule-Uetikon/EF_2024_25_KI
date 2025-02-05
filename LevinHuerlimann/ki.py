@@ -1,15 +1,19 @@
 
 import numpy as np
+import pandas as pd
 from keras.models import Sequential
 from keras.layers import Input, Dense, Dropout
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 
-# Load the Iris dataset
-iris = datasets.load_iris()
-X = iris.data                        # Matrix mit Features × Datensätze
-y = iris.target.reshape(-1, 1)       # Labels
+df = pd.read_csv('\LevinHuerlimann\Stroke_Prediction_Indians.csv') #csv lesen
+
+df = df.drop(columns=['ID'])
+
+x = df.drop()
+
+
 
 # One-hot encode the target variable
 encoder = OneHotEncoder(sparse_output=False)
