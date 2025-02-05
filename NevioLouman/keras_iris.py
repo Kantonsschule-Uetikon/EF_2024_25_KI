@@ -1,6 +1,6 @@
 import numpy as np
-from keras.models import Sequential
-from keras.layers import Input, Dense, Dropout
+from tensorflow.keras.models import Sequential # type: ignore
+from tensorflow.keras.layers import Input, Dense, Dropout # type: ignore
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
