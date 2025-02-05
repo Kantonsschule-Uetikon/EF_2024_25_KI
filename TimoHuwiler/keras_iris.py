@@ -9,8 +9,6 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
-
-#lädt die Daten
 data = pd.read_csv('CAR DETAILS FROM CAR DEKHO.csv')
 
 data.dropna(inplace=True)
