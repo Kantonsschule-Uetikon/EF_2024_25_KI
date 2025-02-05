@@ -1,6 +1,7 @@
 import csv
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder
 
 # Load the Salary dataset
 data = [] # used as a matrix
@@ -14,8 +15,8 @@ data = np.array(data) # Easier to work with np arrays
 
 # Convert gender ('Male' and 'Female' into '1' and '0')
 gender = data[:, 1] # The second column of every row
-encoder = LabelEncoder()
-gender_encoded = encoder.fit_transform(gender)
+encoder_Label = LabelEncoder()
+gender_encoded = encoder_Label.fit_transform(gender)
 data[:, 1] = gender_encoded
 
 # Convert Age, Gender, Education Level, Years of Experience, Senior to float;
@@ -39,3 +40,10 @@ for i in range(len(y)):
        y[i] = 3
 
 print(y)
+
+# One-hot encode the target variable
+# One-hot encoding -> convert each category into a binary vector
+encoder_one_hot = OneHotEncoder(sparse_output=False)
+y_one_hot = encoder_one_hot.fit_transform(y.reshape(-1, 1))
+
+print(y_one_hot)
