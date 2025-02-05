@@ -5,7 +5,7 @@ from keras.models import Sequential
 from keras.layers import Input, Dense, Dropout
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder
+
 
 df = pd.read_csv('LevinHuerlimann\Stroke_Prediction_Indians.csv') #csv lesen
 
@@ -85,24 +85,18 @@ X = df.drop('Stroke Occurrence', axis=1)
 y = df['Stroke Occurrence']
 
 
-
-
-# One-hot encode the target variable
-encoder = OneHotEncoder(sparse_output=False)
-y_one_hot = encoder.fit_transform(y.values.reshape(-1, 1))
-
 # Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y_one_hot, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Define the model
 model = Sequential()
-model.add(Input(shape=(4,)))
+model.add(Input(shape=(X_train.shape[1],)))
 model.add(Dense(8, activation='relu'))
 model.add(Dropout(0.1))
-model.add(Dense(3, activation='softmax'))
+model.add(Dense(1, activation='sigmoid'))
 
 # Compile the model
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
 
 # Train the model
 model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2)
