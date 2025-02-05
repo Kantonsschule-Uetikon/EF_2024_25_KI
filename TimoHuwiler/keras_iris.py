@@ -1,35 +1,47 @@
 import numpy as np
+import pandas as pd
+import tensorflow as tf
+
 from keras.models import Sequential
-from keras.layers import Input, Dense, Dropout
-from sklearn import datasets
+from keras.layers import Dense, Dropout
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
 
-# Load the Iris dataset
-iris = datasets.load_iris()
-X = iris.data                        # Matrix mit Features × Datensätze
-y = iris.target.reshape(-1, 1)       # Labels
+data = pd.read_csv('CAR DETAILS FROM CAR DEKHO.csv')
 
-# One-hot encode the target variable
-encoder = OneHotEncoder(sparse_output=False)
-y_one_hot = encoder.fit_transform(y)
+data.dropna(inplace=True)
 
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y_one_hot, test_size=0.2, random_state=42)
+X = data.drop(columns=['selling_price', 'name'])
+y = data['selling_price'] 
 
-# Define the model
+categorical_features = ['fuel', 'seller_type', 'transmission', 'owner']
+numerical_features = ['year', 'km_driven']
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('cat', OneHotEncoder(), categorical_features),
+        ('num', StandardScaler(), numerical_features)
+    ])
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+X_train = preprocessor.fit_transform(X_train)
+X_test = preprocessor.transform(X_test)
+
 model = Sequential()
-model.add(Input(shape=(4,)))
-model.add(Dense(8, activation='relu'))
-model.add(Dropout(0.1))
-model.add(Dense(3, activation='softmax'))
+model.add(Dense(64, input_shape=(X_train.shape[1],), activation='relu'))
+model.add(Dropout(0.2))
+model.add(Dense(32, activation='relu'))
+model.add(Dense(1)) 
 
-# Compile the model
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])
 
-# Train the model
-model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2)
+history = model.fit(X_train, y_train, epochs=50, batch_size=100, validation_split=0.2)
 
-# Evaluate the model
-loss, accuracy = model.evaluate(X_test, y_test)
-print(f'Loss: {loss}, Accuracy: {accuracy}')
+loss, mae = model.evaluate(X_test, y_test)
+print(f'Test Loss: {loss}, Test MAE: {mae}')
+
+predictions = model.predict(X_test)
+print(predictions[:5])
