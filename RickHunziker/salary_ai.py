@@ -14,10 +14,16 @@ data = np.array(data) # Easier to work with np arrays
 
 print(data[:5])
 
-# Convert gender ('Male' and 'Female' into numbers)
+# Convert gender ('Male' and 'Female' into '1' and '0')
 gender = data[:, 1] # The second column of every row
 encoder = LabelEncoder()
 gender_encoded = encoder.fit_transform(gender)
 data[:, 1] = gender_encoded
 
 print(data[:5])
+
+# Convert Age, Gender, Education Level, Years of Experience, Senior to float;
+# Create matrix with features x datasets
+X = data[:, [0, 1, 2, 4, 8]].astype(float)
+
+print(X)
