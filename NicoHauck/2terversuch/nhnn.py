@@ -20,7 +20,7 @@ class nhnn():
             return self.weights.dot(X) + self.biases
 
         def rueckwaerts(self, dEdY, lern_rate):
-            dEdw = dEdY.dot(self.input.T)
+            dEdw = np.outer(dEdY.reshape(-1, 1), self.input.reshape(-1, 1).T) #problem mit shape jetzt nicht mehr wegen outer
             dEdb = dEdY
             dEdX = (self.weights.T).dot(dEdY)
 
@@ -63,8 +63,7 @@ class nhnn():
                     output = x
                     for layer in self.layers:
                         output = layer.vorwaerts(output)
-                        print(1)
-
+                        
                     error = y - output
 
                     for layer in reversed(self.layers):
@@ -74,8 +73,14 @@ class nhnn():
     def evaluate(self):
         pass
 
-X = np.reshape([[0,0], [0,1], [1,0], [1,1]], (4, 2, 1)) #liste mit spalten
-Y = np.reshape([[0], [1], [1], [0]], (4, 1, 1))
+    def predict(self, X):
+        output = X
+        for layer in self.layers:
+            output = layer.vorwaerts(output)
+        return output
+
+X = np.array([[0,0], [0,1], [1,0], [1,1]])
+Y = np.array([[0], [1], [1], [0]])
 
 nn = nhnn([
     nhnn.Dense(2, 3),
@@ -84,4 +89,10 @@ nn = nhnn([
     nhnn.Sigmoid()
 ])
 
-nn.train(100, 0.1, X, Y)
+nn.train(10000, 0.001, X, Y)
+print(nn.predict(np.array([0,0])))
+print(nn.predict(np.array([0,1])))
+print(nn.predict(np.array([1,0])))
+print(nn.predict(np.array([1,1])))
+print(nn.layers[0].weights)
+print(nn.layers[2].weights)
