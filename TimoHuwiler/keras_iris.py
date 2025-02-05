@@ -1,35 +1,63 @@
 import numpy as np
+import pandas as pd
+import tensorflow as tf
+
 from keras.models import Sequential
-from keras.layers import Input, Dense, Dropout
-from sklearn import datasets
+from keras.layers import Dense, Dropout
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
 
-# Load the Iris dataset
-iris = datasets.load_iris()
-X = iris.data                        # Matrix mit Features × Datensätze
-y = iris.target.reshape(-1, 1)       # Labels
 
-# One-hot encode the target variable
-encoder = OneHotEncoder(sparse_output=False)
-y_one_hot = encoder.fit_transform(y)
+# 1. Daten laden
+# Annahme: Ihr Dataset ist in einer CSV-Datei gespeichert
+data = pd.read_csv('CAR DETAILS FROM CAR DEKHO.csv')  # Ersetzen Sie 'car_data.csv' mit dem Dateinamen Ihres Datensatzes
 
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X, y_one_hot, test_size=0.2, random_state=42)
+# 2. Daten bereinigen (falls notwendig)
+# Entfernen Sie fehlende Werte oder irrelevante Spalten
+data.dropna(inplace=True)
 
-# Define the model
+# 3. Features und Zielvariable definieren
+X = data.drop(columns=['selling_price', 'name'])  # Features (alle Spalten außer 'selling_price' und 'name')
+y = data['selling_price']  # Zielvariable (Verkaufspreis)
+
+# 4. Kategorische und numerische Features identifizieren
+categorical_features = ['fuel', 'seller_type', 'transmission', 'owner']
+numerical_features = ['year', 'km_driven']
+
+# 5. Preprocessing-Pipeline erstellen
+# OneHotEncoder für kategorische Features und StandardScaler für numerische Features
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('cat', OneHotEncoder(), categorical_features),
+        ('num', StandardScaler(), numerical_features)
+    ])
+
+# 6. Daten in Trainings- und Testsets aufteilen
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 7. Preprocessing auf die Daten anwenden
+X_train = preprocessor.fit_transform(X_train)
+X_test = preprocessor.transform(X_test)
+
+# 8. Modell definieren
 model = Sequential()
-model.add(Input(shape=(4,)))
-model.add(Dense(8, activation='relu'))
-model.add(Dropout(0.1))
-model.add(Dense(3, activation='softmax'))
+model.add(Dense(64, input_shape=(X_train.shape[1],), activation='relu'))  # Eingabeschicht
+model.add(Dropout(0.2))  # Dropout zur Regularisierung
+model.add(Dense(32, activation='relu'))  # Versteckte Schicht
+model.add(Dense(1))  # Ausgabeschicht (Regression, daher keine Aktivierungsfunktion)
 
-# Compile the model
-model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+# 9. Modell kompilieren
+model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])  # MAE: Mean Absolute Error
 
-# Train the model
-model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2)
+# 10. Modell trainieren
+history = model.fit(X_train, y_train, epochs=50, batch_size=100, validation_split=0.2)
 
-# Evaluate the model
-loss, accuracy = model.evaluate(X_test, y_test)
-print(f'Loss: {loss}, Accuracy: {accuracy}')
+# 11. Modell evaluieren
+loss, mae = model.evaluate(X_test, y_test)
+print(f'Test Loss: {loss}, Test MAE: {mae}')
+
+# 12. Vorhersagen machen
+predictions = model.predict(X_test)
+print(predictions[:5])  # Zeige die ersten 5 Vorhersagen
