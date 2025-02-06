@@ -38,7 +38,7 @@ for messwerte, label in zip(features, labels):
     actualcr = label
     cr = {"1/8": 0.125, "1/4": 0.25, "1/2": 0.5}.get(actualcr, float(actualcr))
 
-    learning_rate, max_iterations, iterations = 0.005, 1000, 0
+    learning_rate, max_iterations, iterations = 0.005, 10000, 0
 
     while y != z_new and iterations < max_iterations:
         prev_w0, prev_w1, prev_w2 = w0, w1, w2
