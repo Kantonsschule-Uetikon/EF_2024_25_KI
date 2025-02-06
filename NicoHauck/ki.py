@@ -106,12 +106,12 @@ def rückwärts(z1, a1, z2, a2, z3, a3, w3, w2, X, Y):
 
 
 def update_parameter(w1, b1, w2, b2, w3, b3, dw1, db1, dw2, db2, dw3, db3, learning_rate):
-    w1 += learning_rate * dw1
-    b1 += learning_rate * db1
-    w2 += learning_rate * dw2
-    b2 += learning_rate * db2
-    w3 += learning_rate * dw3
-    b3 += learning_rate * db3
+    w1 -= learning_rate * dw1
+    b1 -= learning_rate * db1
+    w2 -= learning_rate * dw2
+    b2 -= learning_rate * db2
+    w3 -= learning_rate * dw3
+    b3 -= learning_rate * db3
     return w1, b1, w2, b2, w3, b3
 
 def trainieren(X, Y, iterationen, learning_rate):
