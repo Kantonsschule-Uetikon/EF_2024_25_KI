@@ -33,7 +33,7 @@ for messwerte, label in zip(features, labels):
     y = cr_mapping[label]
     x0, x1, x2 = 1, messwerte[1] / max_ac, messwerte[2] / max_hp
     z = x0 * w0 + x1 * w1 + x2 * w2
-    z_new = max(min(math.floor(z), 30), -3)
+    z_new = max(min(math.floor(z), 30), 0)
 
     actualcr = label
     cr = {"1/8": 0.125, "1/4": 0.25, "1/2": 0.5}.get(actualcr, float(actualcr))
