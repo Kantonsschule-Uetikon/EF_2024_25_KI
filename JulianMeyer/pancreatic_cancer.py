@@ -1,45 +1,52 @@
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import accuracy_score, log_loss
 
 # Load the dataset
-data = pd.read_csv('pancreatic_cancer_prediction_sample.csv')
+data = pd.read_csv('updated_pancreatic_cancer_data.csv')
+
+# Replace 0 with 'no' and 1 with 'yes'
+data = data.replace({0: 'no', 1: 'yes'})
 
 # Display the first few rows of the dataset to understand its structure
 print(data.head())
 
 # Select the relevant features and the target variable
-X = data[['Gender', 'Smoking_History', 'Alcohol_Consumption']].values
-y = data['Survival_Status'].apply(lambda x: 1 if x == 'Survived' else 0).values  # Binary classification: 1 if Survived, else 0
+X = data[['Gender', 'Smoking_History', 'Alcohol_Consumption', 'Age']]
+y = data['Survival_Status'].apply(lambda x: 1 if x == 'yes' else 0)
+
+# Map Gender to numerical values
+X['Gender'] = X['Gender'].map({'Male': 1, 'Female': 0})
 
 # One-hot encode the categorical features
-categorical_features = ['Gender', 'Smoking_History', 'Alcohol_Consumption']
 encoder = OneHotEncoder(sparse_output=False)
-X_encoded = encoder.fit_transform(data[categorical_features])
+X_encoded = encoder.fit_transform(X[['Smoking_History', 'Alcohol_Consumption']])
 
-# Split the dataset into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X_encoded, y, test_size=0.2, random_state=42)
+# Combine the encoded categorical features with the rest of the features
+X_rest = X[['Gender', 'Age']].values
+X = np.hstack((X_encoded, X_rest))
+
+# Split the dataset into training and testing sets with stratification
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
 # Standardize the features
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
-# Build the neural network model
+# Build and train the neural network model
 model = MLPClassifier(hidden_layer_sizes=(64, 64), activation='relu', solver='adam', max_iter=1000, random_state=42)
-
-# Train the model
 model.fit(X_train, y_train)
 
 # Evaluate the model
-y_pred = model.predict(X_test)
 y_pred_proba = model.predict_proba(X_test)[:, 1]  # Probability of class 1 (Survived)
-accuracy = accuracy_score(y_test, y_pred)
+accuracy = accuracy_score(y_test, model.predict(X_test))
 loss = log_loss(y_test, y_pred_proba)
 print(f'Loss: {loss}, Accuracy: {accuracy*100:.2f}%')
 
 # Display the predicted probabilities for the first few test samples
-print(f'Predicted probabilities: {y_pred_proba[:10]}')
+for i, prob in enumerate(y_pred_proba[:10]):
+    print(f'Sample {i+1}: Probability of surviving pancreatic cancer is {prob*100:.2f}%')
