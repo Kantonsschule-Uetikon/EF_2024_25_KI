@@ -1,26 +1,26 @@
 
 import pandas as pd
-from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
 from keras.callbacks import ReduceLROnPlateau
-from imblearn.over_sampling import SMOTE
 from keras.models import Sequential
 from keras.layers import Input, Dense, Dropout
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from keras.optimizers import SGD
 from keras_tuner import RandomSearch
+from sklearn.preprocessing import MinMaxScaler
+from imblearn.combine import SMOTEENN
+from imblearn.over_sampling import SMOTE
+from keras.callbacks import EarlyStopping
 
 # Load dataset
 df = pd.read_csv(r'C:\Users\huxnu\OneDrive\Documents\GitHub\EF_2024_25_KI\HuxleyNutt\poker-hand-training.csv')
 
-lr_scheduler = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=1e-5)
+
 
 # Defining the input features and target variable
 X = df.drop('Poker Hand', axis=1)
 y = df['Poker Hand']
-
-from sklearn.preprocessing import MinMaxScaler
 
 scaler = MinMaxScaler()
 X_scaled = scaler.fit_transform(X)
@@ -28,9 +28,6 @@ X_scaled = scaler.fit_transform(X)
 # One-hot encode the target variable
 encoder = OneHotEncoder(sparse_output=False)
 y_one_hot = encoder.fit_transform(y.values.reshape(-1, 1))  # Ensure correct shape
-
-from imblearn.combine import SMOTEENN
-from imblearn.over_sampling import SMOTE
 
 # Set n_neighbors to 2 or 3 for smaller classes
 smote = SMOTE(sampling_strategy='auto', k_neighbors=2)  # Reduced from 5 to 2
@@ -40,7 +37,7 @@ X_resampled, y_resampled = smote_enn.fit_resample(X_scaled, y_one_hot)
 
 
 # Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.85, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.88, random_state=42)
 
 def build_model(hp):
     model = Sequential()
@@ -71,16 +68,10 @@ optimizer = SGD(learning_rate=0.01, momentum=0.9)
 model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
 
 # Train the model
-from keras.callbacks import EarlyStopping
+early_stop = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
 
-early_stop = EarlyStopping(monitor='val_loss', patience=100, restore_best_weights=True)
-
-model.fit(X_train, y_train, epochs=200, batch_size=32, validation_split=0.2, callbacks=[early_stop])
+model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2, callbacks=[early_stop])
 
 # Evaluate the model
 loss, accuracy = model.evaluate(X_test, y_test)
 print(f'Loss: {loss}, Accuracy: {accuracy}')
-
-
-
-
