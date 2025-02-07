@@ -47,6 +47,14 @@ accuracy = accuracy_score(y_test, model.predict(X_test))
 loss = log_loss(y_test, y_pred_proba)
 print(f'Loss: {loss}, Accuracy: {accuracy*100:.2f}%')
 
-# Display the predicted probabilities for the first few test samples
-for i, prob in enumerate(y_pred_proba[:10]):
-    print(f'Sample {i+1}: Probability of surviving pancreatic cancer is {prob*100:.2f}%')
+# Display the predicted probabilities for 10 randomly selected test samples
+print("\nDetailed information for 10 randomly selected test samples:")
+random_indices = np.random.choice(len(X_test), 10, replace=False)
+for i, idx in enumerate(random_indices):
+    sample = X_test[idx]
+    gender = 'Male' if sample[-2] == 1 else 'Female'
+    age = sample[-1]
+    smoking_history = 'yes' if sample[0] == 1 else 'no'
+    alcohol_consumption = 'yes' if sample[1] == 1 else 'no'
+    probability = y_pred_proba[idx] * 100
+    print(f'Sample {i+1}: Gender: {gender}, Age: {age}, Smoking History: {smoking_history}, Alcohol Consumption: {alcohol_consumption}, Probability of surviving pancreatic cancer: {probability:.2f}%')
