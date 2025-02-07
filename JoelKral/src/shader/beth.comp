@@ -1,0 +1,30 @@
+#version 460
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+uniform sampler2D src1;
+uniform sampler2D src2;
+layout(binding=2) buffer Dst {
+    vec3 dst;
+};
+//                            5x5 gaussian blur approximation
+const float[] kernel = {
+-0.00390625, -0.015625, -0.0234375, -0.015625, -0.00390625,
+-0.015625,   -0.0625,   -0.09375,   -0.0625,   -0.015625,
+-0.0234375,  -0.09375,   1.859375,  -0.09375,  -0.0234375,
+-0.015625,   -0.0625,   -0.09375,   -0.0625,   -0.015625,
+-0.00390625, -0.015625, -0.0234375, -0.015625, -0.00390625};
+
+void main() {
+    ivec2 pos = ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
+    vec4 sum1 = vec4(0);
+    vec4 sum2 = vec4(0);
+    ivec2 current_pos = ivec2(0);
+    for (int u = 0; u < 5; u++) {
+        for (int v = 0; v < 5; v++) {
+            current_pos = pos + ivec2(u,v) - ivec2(2);
+            sum1 += texelFetch(src1, current_pos, 0); //kernel[v+u*v] *
+            sum2 += texelFetch(src2, current_pos, 0);
+        }}
+    dst = abs(sum1-sum2).xyz;
+
+    dst = vec3(255,255,255);
+}
