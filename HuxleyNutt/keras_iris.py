@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 from keras.callbacks import ReduceLROnPlateau
@@ -15,8 +14,6 @@ from keras.callbacks import EarlyStopping
 
 # Load dataset
 df = pd.read_csv(r'C:\Users\huxnu\OneDrive\Documents\GitHub\EF_2024_25_KI\HuxleyNutt\poker-hand-training.csv')
-
-
 
 # Defining the input features and target variable
 X = df.drop('Poker Hand', axis=1)
