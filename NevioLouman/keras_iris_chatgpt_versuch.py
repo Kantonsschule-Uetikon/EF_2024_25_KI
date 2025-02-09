@@ -1,8 +1,8 @@
 import numpy as np
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Input, Dense, Dropout
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder
+from tensorflow.keras.models import Sequential #type: ignore
+from tensorflow.keras.layers import Input, Dense, Dropout #type: ignore
+from sklearn.model_selection import train_test_split #type: ignore
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder #type: ignore
 
 # Load the dataset
 raw_data = np.genfromtxt("japan_heart_attack_dataset.csv", delimiter=",", dtype=str, skip_header=1)
