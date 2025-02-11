@@ -33,24 +33,23 @@ model.add(Dense(y_train.shape[1], activation='softmax')) #Output-Layer wird hinz
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy']) #Das Modell wird kompiliert
 
 # Train the model
-model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2) #Das Modell wird trainiert
+model.fit(X_train, y_train, epochs=50, batch_size=32, validation_split=0.2)
 
 # Evaluate the model
-loss, accuracy = model.evaluate(X_test, y_test) #Das Modell wird evaluiert
+loss, accuracy = model.evaluate(X_test, y_test)
 print(f'Loss: {loss}, Accuracy: {accuracy}') 
 
 # Function to predict a match outcome
 def predict_match(home_team, away_team): #Die Funktion predict_match nimmt die Namen der beiden Teams als Input
     # Convert teams to one-hot encoded format
     home_encoded = encoder.transform([[home_team]]) 
-    away_encoded = encoder.transform([[away_team]]) #Die gewählten Teams werden in numerische Werte umgewandelt
-    match_data = np.hstack([home_encoded, away_encoded]) #Die numerischen Werte werden wieder in ein Array zusammengefügt
+    away_encoded = encoder.transform([[away_team]]) #Die gewählten Teams werden one-hot-encodiert
+    match_data = np.hstack([home_encoded, away_encoded]) #Die one-hot-encodierten Teams werden in ein Array zusammengefügt
     
-    # Get probability predictions
-    prediction = model.predict(match_data) #Das Modell wird auf die Daten angewendet
+    prediction = model.predict(match_data) #Das Modell wird auf die Daten angewendet und bestimmt die Wahrscheinlichkeiten für die verschiedenen Ergebnisse
     # Format output
     result_labels = label_encoder.classes_  # ['Away Win', 'Draw', 'Home Win']
-    probabilities = {result_labels[i]: round(prediction[0][i] * 100, 2) for i in range(len(result_labels))} #Die Wahrscheinlichkeiten für die verschiedenen Ergebnisse werden berechnet
+    probabilities = {result_labels[i]: round(prediction[0][i] * 100, 2) for i in range(len(result_labels))} #Die Wahrscheinlichkeiten werden in Prozent umgewandelt
     print(f"Predicted Probabilities:\n{probabilities}") #Die Wahrscheinlichkeiten werden ausgegeben
     print(f"Most Likely Outcome: {max(probabilities, key=probabilities.get)}") #Das wahrscheinlichste Ergebnis wird ausgegeben
 
